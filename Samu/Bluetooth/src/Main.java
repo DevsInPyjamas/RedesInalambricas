@@ -33,9 +33,9 @@ public class Main {
                             serviceRecords) {
                         DataElement de = record.getAttributeValue(0x0100);
                         if(de!=null){
-                            System.out.println((String)de.getValue());
+                            System.out.printf("- %s\n", (String)de.getValue());
                         } else {
-                            System.out.println("-Service without name-");
+                            System.out.println("- Service without name -");
                         }
                         System.out.println(record.getConnectionURL(ServiceRecord.NOAUTHENTICATE_NOENCRYPT, false));
                     }
@@ -44,14 +44,14 @@ public class Main {
                 @Override
                 public void serviceSearchCompleted(int i, int i1) {
                     synchronized (INQUIRY_COMPLETED_EVENT){
-                        notifyAll();
+                        INQUIRY_COMPLETED_EVENT.notifyAll();
                     }
                 }
 
                 @Override
                 public void inquiryCompleted(int i) {
                     synchronized (INQUIRY_COMPLETED_EVENT){
-                        notifyAll();
+                        INQUIRY_COMPLETED_EVENT.notifyAll();
                     }
                 }
             };
