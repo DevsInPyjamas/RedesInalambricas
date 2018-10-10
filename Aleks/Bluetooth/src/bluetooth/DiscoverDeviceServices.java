@@ -19,14 +19,17 @@ public class DiscoverDeviceServices {
                 e.printStackTrace();
             }
         }
-        for(RemoteDevice device : agent.retrieveDevices(DiscoveryAgent.CACHED)) {
-            agent.searchServices(new int[] { 0x0100 }, new UUID[] { new UUID(0x1002) }, device,
-                    discoveryListener);
-            System.out.println("  > " + device.getFriendlyName(false));
-            synchronized(inquiryCompletedEvent) {
-                inquiryCompletedEvent.wait();
+        RemoteDevice[] cachedDevices = agent.retrieveDevices(DiscoveryAgent.CACHED);
+        if (cachedDevices != null) {
+            for (RemoteDevice device : cachedDevices) {
+                agent.searchServices(new int[]{0x0100}, new UUID[]{new UUID(0x1002)}, device,
+                        discoveryListener);
+                System.out.println("  > " + device.getFriendlyName(false));
+                synchronized (inquiryCompletedEvent) {
+                    inquiryCompletedEvent.wait();
+                }
+                System.out.println();
             }
-            System.out.println();
         }
 
     }

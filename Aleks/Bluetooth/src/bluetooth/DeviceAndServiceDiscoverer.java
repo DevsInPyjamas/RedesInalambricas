@@ -18,7 +18,7 @@ public class DeviceAndServiceDiscoverer implements DiscoveryListener {
         this.deviceName = this.bluetoothAddress = null;
     }
 
-    public DeviceAndServiceDiscoverer(Object INQUIRY_COMPLETED_EVENT, String str, boolean isBluetoothAddress){
+    public DeviceAndServiceDiscoverer(Object INQUIRY_COMPLETED_EVENT, String str, boolean isBluetoothAddress) {
         this.INQUIRY_COMPLETED_EVENT = INQUIRY_COMPLETED_EVENT;
         bluetoothAddress = (isBluetoothAddress) ? str.toLowerCase() : null;
         deviceName = (isBluetoothAddress) ? null : str.toLowerCase();
@@ -47,9 +47,9 @@ public class DeviceAndServiceDiscoverer implements DiscoveryListener {
         for (ServiceRecord s : servRecord) {
             DataElement serviceName = s.getAttributeValue(0x0100);
             if (serviceName != null) {
-                System.out.println((String) serviceName.getValue());
+                System.out.println("    > " + serviceName.getValue());
             } else {
-                System.out.println("\t\t– Service without name.");
+                System.out.println("    > Service without name.");
             }
             System.out.println(s.getConnectionURL(ServiceRecord.NOAUTHENTICATE_NOENCRYPT, false));
         }
@@ -57,7 +57,9 @@ public class DeviceAndServiceDiscoverer implements DiscoveryListener {
 
     @Override
     public void serviceSearchCompleted(int transID, int respCode) {
-        System.out.println("    " + respCode);
+        if (respCode == DiscoveryListener.SERVICE_SEARCH_NO_RECORDS) {
+            System.err.println("    > No services found in device...");
+        }
         synchronized (INQUIRY_COMPLETED_EVENT) {
             INQUIRY_COMPLETED_EVENT.notifyAll();
         }
