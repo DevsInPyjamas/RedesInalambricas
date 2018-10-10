@@ -1,15 +1,12 @@
 package bluetooth;
 
-import sun.nio.ch.IOUtil;
-
-import javax.bluetooth.BluetoothStateException;
 import javax.bluetooth.DiscoveryAgent;
 import javax.bluetooth.DiscoveryListener;
 import javax.bluetooth.LocalDevice;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.StringWriter;
+
 
 public class DiscoverBy {
 
@@ -18,7 +15,7 @@ public class DiscoverBy {
     public static void main(String[] args) throws IOException {
         LocalDevice localDevice = LocalDevice.getLocalDevice();
         DiscoveryAgent agent = localDevice.getDiscoveryAgent();
-        System.out.print("Are you searching a device by name? (answer with true or false): ");
+        System.out.print("Are you searching a device by bluetooth address? (answer with true or false): ");
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         boolean isAddress = Boolean.valueOf(br.readLine());
         if (isAddress) {
@@ -27,7 +24,7 @@ public class DiscoverBy {
             System.out.print("Tell me the device name to filter: ");
         }
         String input = br.readLine();
-        DiscoveryListener discoveryListener = new DeviceSeeker(inquiryCompletedEvent, input, isAddress);
+        DiscoveryListener discoveryListener = new DeviceAndServiceDiscoverer(inquiryCompletedEvent, input, isAddress);
         System.out.println("============= \tSearching devices\t =============");
         agent.startInquiry(DiscoveryAgent.GIAC, discoveryListener);
         synchronized (inquiryCompletedEvent) {
