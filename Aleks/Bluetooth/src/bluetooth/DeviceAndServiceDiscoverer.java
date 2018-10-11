@@ -51,14 +51,14 @@ public class DeviceAndServiceDiscoverer implements DiscoveryListener {
             } else {
                 System.out.println("    > Service without name.");
             }
-            System.out.println(s.getConnectionURL(ServiceRecord.NOAUTHENTICATE_NOENCRYPT, false));
+            System.out.println("    > Service URL: " + s.getConnectionURL(ServiceRecord.NOAUTHENTICATE_NOENCRYPT, false));
         }
     }
 
     @Override
     public void serviceSearchCompleted(int transID, int respCode) {
         if (respCode == DiscoveryListener.SERVICE_SEARCH_NO_RECORDS) {
-            System.err.println("    > No services found in device...");
+            System.out.println("    > No services found in device...");
         }
         synchronized (INQUIRY_COMPLETED_EVENT) {
             INQUIRY_COMPLETED_EVENT.notifyAll();
@@ -69,7 +69,7 @@ public class DeviceAndServiceDiscoverer implements DiscoveryListener {
     public void inquiryCompleted(int discType) {
         System.out.println("=============\t\tProcess Done\t =============");
         if (!found) {
-            System.err.println("No devices found...");
+            System.out.println("No devices found...");
         }
         synchronized (INQUIRY_COMPLETED_EVENT) {
             INQUIRY_COMPLETED_EVENT.notifyAll();
