@@ -9,10 +9,6 @@ public class DeviceAndServiceDiscoverer implements DiscoveryListener {
     private String bluetoothAddress;
     private boolean found;
 
-    public DeviceAndServiceDiscoverer() {
-        INQUIRY_COMPLETED_EVENT = new Object();
-    }
-
     public DeviceAndServiceDiscoverer(Object INQUIRY_COMPLETED_EVENT) {
         this.INQUIRY_COMPLETED_EVENT = INQUIRY_COMPLETED_EVENT;
         this.deviceName = this.bluetoothAddress = null;
@@ -20,20 +16,20 @@ public class DeviceAndServiceDiscoverer implements DiscoveryListener {
 
     public DeviceAndServiceDiscoverer(Object INQUIRY_COMPLETED_EVENT, String str, boolean isBluetoothAddress) {
         this.INQUIRY_COMPLETED_EVENT = INQUIRY_COMPLETED_EVENT;
-        bluetoothAddress = (isBluetoothAddress) ? str.toLowerCase() : null;
-        deviceName = (isBluetoothAddress) ? null : str.toLowerCase();
+        bluetoothAddress = (isBluetoothAddress) ? str : null;
+        deviceName = (isBluetoothAddress) ? null : str;
     }
 
     @Override
     public void deviceDiscovered(RemoteDevice btDevice, DeviceClass cod) {
         try {
-            String friendlyName = btDevice.getFriendlyName(false).toLowerCase();
-            String blthAddress = btDevice.getBluetoothAddress().toLowerCase();
+            String friendlyName = btDevice.getFriendlyName(false);
+            String blthAddress = btDevice.getBluetoothAddress();
             if (deviceName == null && bluetoothAddress == null) {
                 System.out.printf("    – %s: (%s)\n", friendlyName, blthAddress);
                 found = true;
-            } else if (friendlyName.equals(deviceName) ||
-                    blthAddress.equals(bluetoothAddress)) {
+            } else if (friendlyName.equalsIgnoreCase(deviceName) ||
+                    blthAddress.equalsIgnoreCase(bluetoothAddress)) {
                 System.out.printf("    – %s: (%s)\n", friendlyName, blthAddress);
                 found = true;
             }

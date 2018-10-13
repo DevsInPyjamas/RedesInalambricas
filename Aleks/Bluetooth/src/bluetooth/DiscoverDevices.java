@@ -20,6 +20,7 @@ public class DiscoverDevices {
         System.out.println("Discoverable Mode: " + localDevice.getDiscoverable());
 
         DiscoveryAgent agent = localDevice.getDiscoveryAgent();
+        DiscoveryListener discoveryListener;
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         System.out.print("Are you going to search all near devices (true) or 1 specific device (false)? ");
         Boolean input = Boolean.valueOf(br.readLine());
@@ -28,9 +29,8 @@ public class DiscoverDevices {
              * Search all near devices
              */
             System.out.println("Searching all near devices");
-            DiscoveryListener discoveryListener = new DeviceAndServiceDiscoverer(inquiryCompletedEvent);
+            discoveryListener = new DeviceAndServiceDiscoverer(inquiryCompletedEvent);
             System.out.println("============= \tSearching near devices\t =============");
-            agent.startInquiry(DiscoveryAgent.GIAC, discoveryListener);
         } else {
             /*
              * Search specific device
@@ -43,10 +43,10 @@ public class DiscoverDevices {
                 System.out.print("Tell me the device name to filter: ");
             }
             String input2 = br.readLine();
-            DiscoveryListener discoveryListener = new DeviceAndServiceDiscoverer(inquiryCompletedEvent, input2, isAddress);
+            discoveryListener = new DeviceAndServiceDiscoverer(inquiryCompletedEvent, input2, isAddress);
             System.out.println("============= \tSearching device\t =============");
-            agent.startInquiry(DiscoveryAgent.GIAC, discoveryListener);
         }
+        agent.startInquiry(DiscoveryAgent.GIAC, discoveryListener);
         synchronized (inquiryCompletedEvent) {
             try {
                 inquiryCompletedEvent.wait();
