@@ -22,19 +22,20 @@ public class DeviceAndServiceDiscoverer implements DiscoveryListener {
 
     @Override
     public void deviceDiscovered(RemoteDevice btDevice, DeviceClass cod) {
+        String friendlyName;
         try {
-            String friendlyName = btDevice.getFriendlyName(false);
-            String blthAddress = btDevice.getBluetoothAddress();
-            if (deviceName == null && bluetoothAddress == null) {
-                System.out.printf("    – %s: (%s)\n", friendlyName, blthAddress);
-                found = true;
-            } else if (friendlyName.equalsIgnoreCase(deviceName) ||
-                    blthAddress.equalsIgnoreCase(bluetoothAddress)) {
-                System.out.printf("    – %s: (%s)\n", friendlyName, blthAddress);
-                found = true;
-            }
+            friendlyName = btDevice.getFriendlyName(false);
         } catch (IOException e) {
-            e.printStackTrace();
+            friendlyName = "Unnamed device";
+        }
+        String blthAddress = btDevice.getBluetoothAddress();
+        if (deviceName == null && bluetoothAddress == null) {
+            System.out.printf("    – %s: (%s)\n", friendlyName, blthAddress);
+            found = true;
+        } else if (friendlyName.equalsIgnoreCase(deviceName) ||
+                blthAddress.equalsIgnoreCase(bluetoothAddress)) {
+            System.out.printf("    – %s: (%s)\n", friendlyName, blthAddress);
+            found = true;
         }
     }
 

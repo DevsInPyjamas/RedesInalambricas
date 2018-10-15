@@ -18,10 +18,13 @@ public class DiscoverDeviceServices {
         DiscoveryListener discoveryListener;
 
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        System.out.print("Are you going to search all near devices (true) or 1 specific device (false)? ");
+        System.out.print("Are you going to search all services from near devices (true) or services from " +
+                "1 specific device (false)? ");
         Boolean input = Boolean.valueOf(br.readLine());
         String deviceName = null;
         String bluetoothAddress = null;
+        System.out.print("Are you going to search Serial ports too? (true if the answer is yes): ");
+        boolean searchSerialPortsToo = Boolean.valueOf(br.readLine());
 
         if (input) {
             discoveryListener = new DeviceAndServiceDiscoverer(inquiryCompletedEvent);
@@ -49,14 +52,27 @@ public class DiscoverDeviceServices {
             }
         }
         cachedDevices = agent.retrieveDevices(DiscoveryAgent.CACHED);
+        UUID[] uuids;
+        if (searchSerialPortsToo) {
+            uuids = new UUID[] {
+                new UUID(0x1002), new UUID(0x1101)
+            };
+        } else {
+            uuids = new UUID[] { new UUID(0x1002)};
+        }
         if (cachedDevices != null) {
             for (RemoteDevice device : cachedDevices) {
                 // 0x1002 all UUID
-                // 0x1105 OBEX Object Push
+                // 0x1101 Serial Port
                 if (input) {
-                    agent.searchServices(new int[]{0x0100}, new UUID[]{new UUID(0x1002)}, device,
+                    agent.searchServices(new int[]{0x0100}, uuids, device,
                             discoveryListener);
-                    System.out.println("  > " + device.getFriendlyName(false));
+                    try {
+                        System.out.println("  > " + device.getFriendlyName(false));
+
+                    } catch (IOException e) {
+                        System.out.println("  > Unnamed device");
+                    }
                     synchronized (inquiryCompletedEvent) {
                         inquiryCompletedEvent.wait();
                     }
