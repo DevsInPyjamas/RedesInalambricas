@@ -4,8 +4,7 @@ import javax.bluetooth.*;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.rmi.Remote;
-import java.util.Enumeration;
+import java.util.List;
 
 public class DiscoverDeviceServices {
 
@@ -14,19 +13,19 @@ public class DiscoverDeviceServices {
     public static void main(String[] args) throws IOException, InterruptedException {
         LocalDevice localDevice = LocalDevice.getLocalDevice();
         DiscoveryAgent agent = localDevice.getDiscoveryAgent();
-        RemoteDevice[] cachedDevices;
+        List<RemoteDevice> cachedDevices;
         DiscoveryListener discoveryListener;
 
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         System.out.print("Are you going to search all services from near devices (true) or services from " +
                 "1 specific device (false)? ");
-        Boolean input = Boolean.valueOf(br.readLine());
+        Boolean searchNearDevices = Boolean.valueOf(br.readLine());
         String deviceName = null;
         String bluetoothAddress = null;
         System.out.print("Are you going to search Serial ports too? (true if the answer is yes): ");
         boolean searchSerialPortsToo = Boolean.valueOf(br.readLine());
 
-        if (input) {
+        if (searchNearDevices) {
             discoveryListener = new DeviceAndServiceDiscoverer(inquiryCompletedEvent);
             System.out.println("============= \tSearching near devices\t =============");
         } else {
@@ -51,7 +50,8 @@ public class DiscoverDeviceServices {
                 e.printStackTrace();
             }
         }
-        cachedDevices = agent.retrieveDevices(DiscoveryAgent.CACHED);
+        ((DeviceAndServiceDiscoverer) discoveryListener).printAllDevices();
+        cachedDevices = ((DeviceAndServiceDiscoverer) discoveryListener).getCachedDevices();
         UUID[] uuids;
         if (searchSerialPortsToo) {
             uuids = new UUID[] {
@@ -60,33 +60,31 @@ public class DiscoverDeviceServices {
         } else {
             uuids = new UUID[] { new UUID(0x1002)};
         }
-        if (cachedDevices != null) {
-            for (RemoteDevice device : cachedDevices) {
-                // 0x1002 all UUID
-                // 0x1101 Serial Port
-                if (input) {
-                    agent.searchServices(new int[]{0x0100}, uuids, device,
-                            discoveryListener);
-                    try {
-                        System.out.println("  > " + device.getFriendlyName(false));
-
-                    } catch (IOException e) {
-                        System.out.println("  > Unnamed device");
-                    }
-                    synchronized (inquiryCompletedEvent) {
-                        inquiryCompletedEvent.wait();
-                    }
-                } else if (device.getBluetoothAddress().equalsIgnoreCase(bluetoothAddress) ||
-                            device.getFriendlyName(false).equalsIgnoreCase(deviceName)){
-                    agent.searchServices(new int[]{0x0100}, new UUID[]{new UUID(0x1002)}, device,
-                            discoveryListener);
+        for (RemoteDevice device : cachedDevices) {
+            // 0x1002 all UUID
+            // 0x1101 Serial Port
+            if (searchNearDevices) {
+                agent.searchServices(new int[]{0x0100}, uuids, device,
+                        discoveryListener);
+                try {
                     System.out.println("  > " + device.getFriendlyName(false));
-                    synchronized (inquiryCompletedEvent) {
-                        inquiryCompletedEvent.wait();
-                    }
+
+                } catch (IOException e) {
+                    System.out.println("  > Unnamed device");
                 }
-                System.out.println();
+                synchronized (inquiryCompletedEvent) {
+                    inquiryCompletedEvent.wait();
+                }
+            } else if (device.getBluetoothAddress().equalsIgnoreCase(bluetoothAddress) ||
+                        device.getFriendlyName(false).equalsIgnoreCase(deviceName)){
+                agent.searchServices(new int[]{0x0100}, new UUID[]{new UUID(0x1002)}, device,
+                        discoveryListener);
+                System.out.println("  > " + device.getFriendlyName(false));
+                synchronized (inquiryCompletedEvent) {
+                    inquiryCompletedEvent.wait();
+                }
             }
+            System.out.println();
         }
     }
 }

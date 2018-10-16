@@ -54,5 +54,10 @@ public class DiscoverDevices {
                 e.printStackTrace();
             }
         }
+        ((DeviceAndServiceDiscoverer) discoveryListener).printAllDevices();
+        // Debug purposes to know how they are getting in the cache
+        // for(RemoteDevice device : agent.retrieveDevices(DiscoveryAgent.CACHED)) {
+        //     System.out.print(device.getFriendlyName(false) + " ");
+        // }
     }
 }

@@ -2,22 +2,31 @@ package bluetooth;
 
 import javax.bluetooth.*;
 import java.io.IOException;
+import java.rmi.Remote;
+import java.util.ArrayList;
+import java.util.List;
 
 public class DeviceAndServiceDiscoverer implements DiscoveryListener {
     private final Object INQUIRY_COMPLETED_EVENT;
     private String deviceName;
     private String bluetoothAddress;
     private boolean found;
+    private int devicesDiscovered;
+    private List<RemoteDevice> cachedDevices;
 
     public DeviceAndServiceDiscoverer(Object INQUIRY_COMPLETED_EVENT) {
         this.INQUIRY_COMPLETED_EVENT = INQUIRY_COMPLETED_EVENT;
         this.deviceName = this.bluetoothAddress = null;
+        devicesDiscovered = 0;
+        cachedDevices = new ArrayList<>();
     }
 
     public DeviceAndServiceDiscoverer(Object INQUIRY_COMPLETED_EVENT, String str, boolean isBluetoothAddress) {
         this.INQUIRY_COMPLETED_EVENT = INQUIRY_COMPLETED_EVENT;
         bluetoothAddress = (isBluetoothAddress) ? str : null;
         deviceName = (isBluetoothAddress) ? null : str;
+        devicesDiscovered = 0;
+        cachedDevices = new ArrayList<>();
     }
 
     @Override
@@ -30,12 +39,26 @@ public class DeviceAndServiceDiscoverer implements DiscoveryListener {
         }
         String blthAddress = btDevice.getBluetoothAddress();
         if (deviceName == null && bluetoothAddress == null) {
-            System.out.printf("    – %s: (%s)\n", friendlyName, blthAddress);
+            devicesDiscovered++;
+            cachedDevices.add(btDevice);
             found = true;
         } else if (friendlyName.equalsIgnoreCase(deviceName) ||
                 blthAddress.equalsIgnoreCase(bluetoothAddress)) {
-            System.out.printf("    – %s: (%s)\n", friendlyName, blthAddress);
+            devicesDiscovered++;
+            cachedDevices.add(btDevice);
             found = true;
+        }
+    }
+
+    public void printAllDevices() {
+        int devices = 1;
+        for(RemoteDevice device : cachedDevices) {
+            try {
+                System.out.printf("    %d. %s: (%s)\n",devices, device.getFriendlyName(false), device.getBluetoothAddress());
+            } catch (IOException e) {
+                System.out.printf("    %d. Unnamed device\n", devices);
+            }
+            devices++;
         }
     }
 
@@ -65,11 +88,16 @@ public class DeviceAndServiceDiscoverer implements DiscoveryListener {
     @Override
     public void inquiryCompleted(int discType) {
         System.out.println("=============\t\tProcess Done\t =============");
+        System.out.println("Found " + devicesDiscovered + " devices:");
         if (!found) {
             System.out.println("No devices found...");
         }
         synchronized (INQUIRY_COMPLETED_EVENT) {
             INQUIRY_COMPLETED_EVENT.notifyAll();
         }
+    }
+
+    public List<RemoteDevice> getCachedDevices() {
+        return cachedDevices;
     }
 }
