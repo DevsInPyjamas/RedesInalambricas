@@ -71,7 +71,7 @@ public class DeviceAndServiceDiscoverer implements DiscoveryListener {
             } else {
                 System.out.println("    > Service without name.");
             }
-            System.out.println("    > Service URL: " + s.getConnectionURL(ServiceRecord.NOAUTHENTICATE_NOENCRYPT, false));
+            System.out.println("      > Service URL: " + s.getConnectionURL(ServiceRecord.NOAUTHENTICATE_NOENCRYPT, false));
         }
     }
 

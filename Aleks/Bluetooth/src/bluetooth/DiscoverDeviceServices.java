@@ -20,8 +20,8 @@ public class DiscoverDeviceServices {
         System.out.print("Are you going to search all services from near devices (true) or services from " +
                 "1 specific device (false)? ");
         Boolean searchNearDevices = Boolean.valueOf(br.readLine());
-        String deviceName = null;
-        String bluetoothAddress = null;
+        String deviceName;
+        String bluetoothAddress;
         System.out.print("Are you going to search Serial ports too? (true if the answer is yes): ");
         boolean searchSerialPortsToo = Boolean.valueOf(br.readLine());
 
@@ -63,7 +63,6 @@ public class DiscoverDeviceServices {
         for (RemoteDevice device : cachedDevices) {
             // 0x1002 all UUID
             // 0x1101 Serial Port
-            if (searchNearDevices) {
                 agent.searchServices(new int[]{0x0100}, uuids, device,
                         discoveryListener);
                 try {
@@ -75,15 +74,6 @@ public class DiscoverDeviceServices {
                 synchronized (inquiryCompletedEvent) {
                     inquiryCompletedEvent.wait();
                 }
-            } else if (device.getBluetoothAddress().equalsIgnoreCase(bluetoothAddress) ||
-                        device.getFriendlyName(false).equalsIgnoreCase(deviceName)){
-                agent.searchServices(new int[]{0x0100}, new UUID[]{new UUID(0x1002)}, device,
-                        discoveryListener);
-                System.out.println("  > " + device.getFriendlyName(false));
-                synchronized (inquiryCompletedEvent) {
-                    inquiryCompletedEvent.wait();
-                }
-            }
             System.out.println();
         }
     }
