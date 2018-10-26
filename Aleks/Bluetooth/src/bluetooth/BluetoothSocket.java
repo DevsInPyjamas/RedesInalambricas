@@ -11,7 +11,7 @@ public class BluetoothSocket {
         LocalDevice localDevice = LocalDevice.getLocalDevice();
         DiscoveryAgent agent = localDevice.getDiscoveryAgent();
         DiscoveryListener discoveryListener;
-        String deviceAddress;
+        String serverBluetoothAddress;
         RemoteDevice[] cachedDevices;
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
@@ -30,8 +30,8 @@ public class BluetoothSocket {
                     INQUIRY_COMPLETED_EVENT.wait();
                 }
                 cachedDevices = agent.retrieveDevices(DiscoveryAgent.CACHED);
-                deviceAddress = getBluetoothAddress(cachedDevices, deviceName);
-                if(deviceAddress == null) {
+                serverBluetoothAddress = getBluetoothAddress(cachedDevices, deviceName);
+                if(serverBluetoothAddress == null) {
                     System.err.println("Device not found...");
                     System.exit(-1);
                 }
@@ -49,11 +49,11 @@ public class BluetoothSocket {
                 ((DeviceAndServiceDiscoverer) discoveryListener).printAllDevices();
                 System.out.print("Tell me the number of the device to connect: ");
                 int number = Integer.valueOf(br.readLine()) - 1;
-                deviceAddress = agent.retrieveDevices(DiscoveryAgent.CACHED)[number].getBluetoothAddress();
+                serverBluetoothAddress = agent.retrieveDevices(DiscoveryAgent.CACHED)[number].getBluetoothAddress();
             }
         } else {
             System.out.print("Tell me the bluetooth address: ");
-            deviceAddress = br.readLine();
+            serverBluetoothAddress = br.readLine();
         }
     }
 

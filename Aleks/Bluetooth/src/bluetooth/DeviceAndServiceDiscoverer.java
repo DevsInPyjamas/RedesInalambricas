@@ -2,7 +2,6 @@ package bluetooth;
 
 import javax.bluetooth.*;
 import java.io.IOException;
-import java.rmi.Remote;
 import java.util.ArrayList;
 import java.util.List;
 
