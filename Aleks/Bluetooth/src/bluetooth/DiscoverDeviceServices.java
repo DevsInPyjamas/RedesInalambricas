@@ -8,7 +8,7 @@ import java.util.List;
 
 public class DiscoverDeviceServices {
 
-    private static final Object inquiryCompletedEvent = new Object();
+    private static final Object INQUIRY_COMPLETED_EVENT = new Object();
 
     public static void main(String[] args) throws IOException, InterruptedException {
         LocalDevice localDevice = LocalDevice.getLocalDevice();
@@ -26,7 +26,7 @@ public class DiscoverDeviceServices {
         boolean searchSerialPortsToo = Boolean.valueOf(br.readLine());
 
         if (searchNearDevices) {
-            discoveryListener = new DeviceAndServiceDiscoverer(inquiryCompletedEvent);
+            discoveryListener = new DeviceAndServiceDiscoverer(INQUIRY_COMPLETED_EVENT);
             System.out.println("============= \tSearching near devices\t =============");
         } else {
             System.out.print("Are you searching a device by bluetooth address? (answer with true or false): ");
@@ -34,18 +34,18 @@ public class DiscoverDeviceServices {
             if (isAddress) {
                 System.out.print("Tell me the bluetooth address to filter (without : between bits): ");
                 bluetoothAddress = br.readLine();
-                discoveryListener = new DeviceAndServiceDiscoverer(inquiryCompletedEvent, bluetoothAddress, true);
+                discoveryListener = new DeviceAndServiceDiscoverer(INQUIRY_COMPLETED_EVENT, bluetoothAddress, true);
             } else {
                 System.out.print("Tell me the device name to filter: ");
                 deviceName = br.readLine();
-                discoveryListener = new DeviceAndServiceDiscoverer(inquiryCompletedEvent, deviceName, false);
+                discoveryListener = new DeviceAndServiceDiscoverer(INQUIRY_COMPLETED_EVENT, deviceName, false);
             }
             System.out.println("============= \tSearching device\t =============");
         }
         agent.startInquiry(DiscoveryAgent.GIAC, discoveryListener);
-        synchronized (inquiryCompletedEvent) {
+        synchronized (INQUIRY_COMPLETED_EVENT) {
             try {
-                inquiryCompletedEvent.wait();
+                INQUIRY_COMPLETED_EVENT.wait();
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -71,8 +71,8 @@ public class DiscoverDeviceServices {
                 } catch (IOException e) {
                     System.out.println("  > Unnamed device");
                 }
-                synchronized (inquiryCompletedEvent) {
-                    inquiryCompletedEvent.wait();
+                synchronized (INQUIRY_COMPLETED_EVENT) {
+                    INQUIRY_COMPLETED_EVENT.wait();
                 }
             System.out.println();
         }

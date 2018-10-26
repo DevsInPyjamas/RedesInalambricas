@@ -9,7 +9,7 @@ import java.io.InputStreamReader;
 
 public class DiscoverDevices {
 
-    private static final Object inquiryCompletedEvent = new Object();
+    private static final Object INQUIRY_COMPLETED_EVENT = new Object();
 
     public static void main(String[] args) throws IOException {
         /* Show local device bluetooth information (Exercise 2.1) */
@@ -29,7 +29,7 @@ public class DiscoverDevices {
              * Search all near devices
              */
             System.out.println("Searching all near devices");
-            discoveryListener = new DeviceAndServiceDiscoverer(inquiryCompletedEvent);
+            discoveryListener = new DeviceAndServiceDiscoverer(INQUIRY_COMPLETED_EVENT);
             System.out.println("============= \tSearching near devices\t =============");
         } else {
             /*
@@ -43,13 +43,13 @@ public class DiscoverDevices {
                 System.out.print("Tell me the device name to filter: ");
             }
             String input2 = br.readLine();
-            discoveryListener = new DeviceAndServiceDiscoverer(inquiryCompletedEvent, input2, isAddress);
+            discoveryListener = new DeviceAndServiceDiscoverer(INQUIRY_COMPLETED_EVENT, input2, isAddress);
             System.out.println("============= \tSearching device\t =============");
         }
         agent.startInquiry(DiscoveryAgent.GIAC, discoveryListener);
-        synchronized (inquiryCompletedEvent) {
+        synchronized (INQUIRY_COMPLETED_EVENT) {
             try {
-                inquiryCompletedEvent.wait();
+                INQUIRY_COMPLETED_EVENT.wait();
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
