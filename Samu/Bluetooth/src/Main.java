@@ -28,7 +28,7 @@ public class Main {
             // Ex 2, 3, 4, 5
             DiscoveryAgent da = device.getDiscoveryAgent();
             BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-            boolean isBluetoothAddress, globalSearch;
+            boolean isBluetoothAddress, globalSearch, searchSerialPortsToo;
             DeviceDiscoverer deviceDiscoverer;
 
             System.out.println(" Would you like to find one or every device?(1 for single, 2 for all)");
@@ -51,6 +51,10 @@ public class Main {
             } else {
                 deviceDiscoverer = new DeviceDiscoverer(INQUIRY_COMPLETED_EVENT);
             }
+
+            System.out.println("Would you like to search serial ports too?(Y for yes, anything for no)");
+            searchSerialPortsToo = br.readLine().toUpperCase().equals("Y");
+
             System.out.println("\n=====Finding device=====");
             da.startInquiry(DiscoveryAgent.GIAC, deviceDiscoverer);
             synchronized (INQUIRY_COMPLETED_EVENT) {
@@ -62,8 +66,16 @@ public class Main {
             }
 
             cachedDevices = deviceDiscoverer.getCachedDevices();
+            UUID[] uuids;
+            if (searchSerialPortsToo) {
+                uuids = new UUID[] {
+                        new UUID(0x1002), new UUID(0x1101)
+                };
+            } else {
+                uuids = new UUID[] { new UUID(0x1002)};
+            }
             for (RemoteDevice rd : cachedDevices) {
-                da.searchServices(new int[]{0x0100}, new UUID[]{new UUID(0x1002)}, rd, deviceDiscoverer);
+                da.searchServices(new int[]{0x0100}, uuids, rd, deviceDiscoverer);
                 try {
                     System.out.println("    " + rd.getFriendlyName(false));
                 } catch (IOException e) {
