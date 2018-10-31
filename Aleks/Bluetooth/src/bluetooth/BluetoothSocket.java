@@ -60,7 +60,7 @@ public class BluetoothSocket {
         sc.close();
     }
 
-    private static String searchDevices(BufferedReader br, DiscoveryAgent agent) {
+    public static String searchDevices(BufferedReader br, DiscoveryAgent agent) {
         String serverBluetoothAddress = null;
         List<RemoteDevice> cachedDevices;
         try {
