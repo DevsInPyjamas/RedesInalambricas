@@ -7,7 +7,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.List;
-import java.util.NoSuchElementException;
 
 public class BluetoothSocket {
     private static final Object INQUIRY_COMPLETED_EVENT = new Object();
@@ -32,7 +31,7 @@ public class BluetoothSocket {
                 INQUIRY_COMPLETED_EVENT.wait();
             }
             ((DeviceAndServiceDiscoverer) discoveryListener).printAllDevices();
-            System.out.println("Tell me the device to connect to: ");
+            System.out.print("Tell me the device to connect to: ");
             int devicePos = Integer.parseInt(br.readLine()) - 1;
             cachedDevices = ((DeviceAndServiceDiscoverer) discoveryListener).getCachedDevices();
             RemoteDevice device = cachedDevices.get(devicePos);
@@ -42,10 +41,9 @@ public class BluetoothSocket {
                 INQUIRY_COMPLETED_EVENT.wait();
             }
             System.out.println();
-            try {
-                serverBluetoothAddress = ((DeviceAndServiceDiscoverer) discoveryListener).allUrls().get(0).get("chat");
-            } catch(NoSuchElementException a) {
-                System.err.println("This device has no server....");
+            serverBluetoothAddress = ((DeviceAndServiceDiscoverer) discoveryListener).allUrls().get(0).get("chat");
+            if (serverBluetoothAddress == null) {
+                System.err.println("There is no server in that device...");
                 System.exit(-1);
             }
         } catch (InterruptedException | IOException e) {
