@@ -74,5 +74,6 @@ public class DiscoverDeviceServices {
                 }
             System.out.println();
         }
+        ((DeviceAndServiceDiscoverer) discoveryListener).printAllServices();
     }
 }

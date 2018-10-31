@@ -14,7 +14,7 @@ public class DeviceAndServiceDiscoverer implements DiscoveryListener {
     private boolean found;
     private int devicesDiscovered;
     private List<RemoteDevice> cachedDevices;
-    List<String> allUrls = new ArrayList<>();
+    private List<Map<String, String>> allUrlsFromAllDevices = new ArrayList<>();
 
 
     public DeviceAndServiceDiscoverer(Object INQUIRY_COMPLETED_EVENT) {
@@ -65,24 +65,38 @@ public class DeviceAndServiceDiscoverer implements DiscoveryListener {
         }
     }
 
+    public void printAllServices() {
+        int devices = 1;
+        int serviceNum;
+        for(Map<String, String> services : allUrlsFromAllDevices) {
+            serviceNum = 1;
+            System.out.println("    " + devices + ".");
+            for(String serviceKey : services.keySet()) {
+                System.out.println("        " + serviceNum + ". " + serviceKey + ": " + services.get(serviceKey));
+                serviceNum++;
+            }
+            devices++;
+        }
+    }
+
     @Override
     public void servicesDiscovered(int transID, ServiceRecord[] servRecord) {
+        Map<String, String> currentURLS = new HashMap<>();
         for (ServiceRecord s : servRecord) {
             DataElement serviceName = s.getAttributeValue(0x0100);
             if (serviceName != null) {
                 System.out.println("    > " + serviceName.getValue());
+                currentURLS.put((String) serviceName.getValue(), s.getConnectionURL(ServiceRecord.NOAUTHENTICATE_NOENCRYPT, false));
             } else {
                 System.out.println("    > Service without name.");
             }
-            if (bluetoothAddress != null || deviceName != null) {
-                allUrls.add("      > Service URL: " + s.getConnectionURL(ServiceRecord.NOAUTHENTICATE_NOENCRYPT, false));
-            }
             System.out.println("      > Service URL: " + s.getConnectionURL(ServiceRecord.NOAUTHENTICATE_NOENCRYPT, false));
         }
+        allUrlsFromAllDevices.add(currentURLS);
     }
 
-    public List<String> allUrls() {
-        return allUrls;
+    public List<Map<String, String>> allUrls() {
+        return allUrlsFromAllDevices;
     }
 
     @Override
