@@ -3,7 +3,9 @@ package bluetooth;
 import javax.bluetooth.*;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class DeviceAndServiceDiscoverer implements DiscoveryListener {
     private final Object INQUIRY_COMPLETED_EVENT;
@@ -12,6 +14,8 @@ public class DeviceAndServiceDiscoverer implements DiscoveryListener {
     private boolean found;
     private int devicesDiscovered;
     private List<RemoteDevice> cachedDevices;
+    List<String> allUrls = new ArrayList<>();
+
 
     public DeviceAndServiceDiscoverer(Object INQUIRY_COMPLETED_EVENT) {
         this.INQUIRY_COMPLETED_EVENT = INQUIRY_COMPLETED_EVENT;
@@ -70,8 +74,15 @@ public class DeviceAndServiceDiscoverer implements DiscoveryListener {
             } else {
                 System.out.println("    > Service without name.");
             }
+            if (bluetoothAddress != null || deviceName != null) {
+                allUrls.add("      > Service URL: " + s.getConnectionURL(ServiceRecord.NOAUTHENTICATE_NOENCRYPT, false));
+            }
             System.out.println("      > Service URL: " + s.getConnectionURL(ServiceRecord.NOAUTHENTICATE_NOENCRYPT, false));
         }
+    }
+
+    public List<String> allUrls() {
+        return allUrls;
     }
 
     @Override

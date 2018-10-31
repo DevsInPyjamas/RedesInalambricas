@@ -61,8 +61,6 @@ public class DiscoverDeviceServices {
             uuids = new UUID[] { new UUID(0x1002)};
         }
         for (RemoteDevice device : cachedDevices) {
-            // 0x1002 all UUID
-            // 0x1101 Serial Port
                 agent.searchServices(new int[]{0x0100}, uuids, device,
                         discoveryListener);
                 try {
