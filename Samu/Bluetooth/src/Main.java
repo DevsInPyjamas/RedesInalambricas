@@ -4,12 +4,10 @@ import javax.bluetooth.*;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.nio.Buffer;
-import java.nio.BufferOverflowException;
 import java.util.List;
 
 public class Main {
-    static final Object INQUIRY_COMPLETED_EVENT = new Object();//remove
+    static final Object INQUIRY_COMPLETED_EVENT = new Object();
 
     public static void main(String[] args) throws InterruptedException, IOException {
         LocalDevice device = null;
@@ -76,15 +74,9 @@ public class Main {
             }
             for (RemoteDevice rd : cachedDevices) {
                 da.searchServices(new int[]{0x0100}, uuids, rd, deviceDiscoverer);
-                try {
-                    System.out.println("    " + rd.getFriendlyName(false));
-                } catch (IOException e) {
-                    System.out.println("    Unnamed device");
-                }
                 synchronized (INQUIRY_COMPLETED_EVENT) {
                     INQUIRY_COMPLETED_EVENT.wait();
                 }
-                System.out.println();
             }
 
 
