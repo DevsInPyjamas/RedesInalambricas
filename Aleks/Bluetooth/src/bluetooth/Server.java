@@ -19,7 +19,7 @@ public class Server {
         System.out.println("Datos del servidor: " + ld.getBluetoothAddress() + " - " + ld.getFriendlyName());
         System.out.println("\nServidor Iniciado. Esperando clientes...");
 
-        StreamConnection con = (StreamConnection) service.acceptAndOpen();
+        StreamConnection con = service.acceptAndOpen();
         RemoteDevice dev = RemoteDevice.getRemoteDevice(con);
         System.out.println("Direcci�nn del dispositivo remoto: " + dev.getBluetoothAddress());
         System.out.println("Nombre del dispositivo remoto: " + dev.getFriendlyName(true));

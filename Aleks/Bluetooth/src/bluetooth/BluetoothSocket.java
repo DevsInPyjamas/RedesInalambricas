@@ -3,20 +3,61 @@ package bluetooth;
 import javax.bluetooth.*;
 import javax.microedition.io.Connector;
 import javax.microedition.io.StreamConnection;
+import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.List;
+import java.util.Scanner;
 
 public class BluetoothSocket {
     private static final Object INQUIRY_COMPLETED_EVENT = new Object();
     public static void main(String[] args) throws IOException {
+        boolean[] ptrBool = {false};
         LocalDevice localDevice = LocalDevice.getLocalDevice();
         DiscoveryAgent agent = localDevice.getDiscoveryAgent();
-        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        String bluetoothURL = searchDevices(br, agent);
+        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(System.in));
+        String bluetoothURL = searchDevices(bufferedReader, agent);
         StreamConnection service = (StreamConnection) Connector.open(bluetoothURL);
         System.out.println("connected to server!");
+
+        Scanner sc = new Scanner(System.in);
+        BufferedReader br = new BufferedReader(new InputStreamReader(service.openInputStream()));
+        BufferedOutputStream bo = new BufferedOutputStream(service.openOutputStream());
+
+        Thread t = new Thread(() -> {
+            System.out.print(" > ");
+            while(!ptrBool[0] && sc.hasNext()) {
+                try {
+                    String linea = sc.nextLine();
+                    bo.write(linea.getBytes());
+                    bo.write('\n');
+                    bo.flush();
+                    System.out.print(" > ");
+                    ptrBool[0] = linea.equals("exit");
+                } catch (IOException e) {
+                    ptrBool[0] = false;
+                    e.printStackTrace();
+                }
+            }
+        }, "Terminal reader");
+        t.start();
+
+        String linea = br.readLine();
+        while(!ptrBool[0] && linea!=null){
+            System.out.println(linea);
+            linea = br.readLine();
+            if("exit".equals(linea)) {
+                ptrBool[0] = true;
+                bo.write("exit\n".getBytes());
+                bo.flush();
+            }
+        }
+
+        br.close();
+        bo.close();
+        service.close();
+        sc.close();
     }
 
     private static String searchDevices(BufferedReader br, DiscoveryAgent agent) {
