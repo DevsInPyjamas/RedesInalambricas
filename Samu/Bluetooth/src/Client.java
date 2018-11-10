@@ -69,7 +69,7 @@ public class Client {
                         bo.write('\n');
                         bo.flush();
                         System.out.print(" > ");
-                        ptrBool[0] = linea.equals("FIN");
+                        ptrBool[0] = linea.equals("exit");
                     } catch (IOException e) {
                         ptrBool[0] = false;
                         e.printStackTrace();

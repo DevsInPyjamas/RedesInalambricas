@@ -23,7 +23,7 @@ public class Main {
             System.out.println("Friendly name: " + device.getFriendlyName());
             System.out.println("BlueCove version: " + LocalDevice.getProperty("bluecove"));
 
-            // Ex 2, 3, 4, 5
+            // Rest of exercises
             DiscoveryAgent da = device.getDiscoveryAgent();
             BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
             boolean isBluetoothAddress, globalSearch, searchSerialPortsToo;
